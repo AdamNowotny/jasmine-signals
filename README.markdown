@@ -17,12 +17,12 @@ var signal = new signals.Signal();
 var signalSpy = spyOnSignal(signal);
 ```
 
-### Specific parameters
+### Specific parameters using predicate
 You can also pass a boolean function to specify which dispatches to count.
 
 ```js
 var signal = new signals.Signal();
-var signalSpy = spyOnSignal(signal, function (dispatchInfo) {
+var signalSpy = spyOnSignal(signal).matching(function (dispatchInfo) {
 	return dispatchInfo === 5;
 });
 ```
@@ -31,6 +31,15 @@ This will only look at signals dispatched like this:
 
 ```js
 signal.dispatch(5);
+```
+
+### Specific parameter values
+You can simplify the above using:
+
+```js
+var signal = new signals.Signal();
+var signalSpy = spyOnSignal(signal).matchingValues(5);
+});
 ```
 
 ### Expectations
