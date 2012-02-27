@@ -39,14 +39,13 @@ You can simplify the above using:
 ```js
 var signal = new signals.Signal();
 var signalSpy = spyOnSignal(signal).matchingValues(5);
-});
 ```
 
 ### Expectations
 After defining the spy you can set expectations in your spec.
 
 ```js
-expect(signalSpy).toHaveBeenDispatched();  // expect signal to have been dispatched
+expect(signalSpy).toHaveBeenDispatched();  // expect signal to have been dispatched at least once
 expect(signalSpy).toHaveBeenDispatched(3); // expect signal to have been dispatched 3 times
 ```
 
