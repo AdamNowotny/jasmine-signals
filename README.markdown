@@ -49,6 +49,12 @@ expect(signalSpy).toHaveBeenDispatched();  // expect signal to have been dispatc
 expect(signalSpy).toHaveBeenDispatched(3); // expect signal to have been dispatched 3 times
 ```
 
+### Reset
+
+```js
+signalSpy.reset(); // reset the counter
+```
+
 Examples
 --------
 Check the [spec](https://github.com/AdamNowotny/jasmine-signals/tree/master/spec) folder for full examples.
