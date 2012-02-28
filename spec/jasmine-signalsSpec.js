@@ -36,7 +36,7 @@ describe('jasmine-signals', function () {
 
 			expect(function () {
 				expect(signal).toHaveBeenDispatched();
-			}).toThrow(new Error('Expected a spy'));
+			}).toThrow(new Error('Expected a SignalSpy'));
 		});
 
 		it('should know if signal dispatched', function () {
@@ -81,30 +81,62 @@ describe('jasmine-signals', function () {
 
 	});
 
-	it('should spyOnSignal with function matcher', function () {
-		var signal = new signals.Signal();
-		var signalSpy = spyOnSignal(signal).matching(function (signalInfo) {
-			return signalInfo === 1;
+	describe('toHaveBeenDispatchedMatching', function () {
+
+		it('should pass if dispatch parameters match predicate', function () {
+			var signal = new signals.Signal();
+			var signalSpy = spyOnSignal(signal);
+
+			signal.dispatch(1);
+			signal.dispatch(5);
+			signal.dispatch(1);
+
+			expect(signalSpy).toHaveBeenDispatchedMatching(function (signalInfo) {
+				return signalInfo === 5;
+			});
 		});
 
-		signal.dispatch(1);
-		signal.dispatch(5);
-		signal.dispatch(1);
+		it('should pass if dispatch parameters match predicate given number of times', function () {
+			var signal = new signals.Signal();
+			var signalSpy = spyOnSignal(signal);
 
-		expect(signalSpy).toHaveBeenDispatched();
-		expect(signalSpy).toHaveBeenDispatched(2);
+			signal.dispatch(1);
+			signal.dispatch(5);
+			signal.dispatch(1);
+
+			expect(signalSpy).toHaveBeenDispatchedMatching(function (signalInfo) {
+				return signalInfo === 1;
+			}, 2);
+		});
+
 	});
 
-	it('should spyOnSignal matching values', function () {
+	describe('toHaveBeenDispatchedWith', function() {
+
+		it('should pass if dispatched with given parameteres', function() {
+			var signal = new signals.Signal();
+			var signalSpy = spyOnSignal(signal);
+
+			signal.dispatch(1);
+			signal.dispatch(5);
+			signal.dispatch(1);
+
+			expect(signalSpy).toHaveBeenDispatchedWith(1);
+			expect(signalSpy).toHaveBeenDispatchedWith(5);
+		});
+
+	});
+	
+	it('should reset spy', function () {
 		var signal = new signals.Signal();
-		var signalSpy = spyOnSignal(signal).matchingValues(1);
+		var signalSpy = spyOnSignal(signal);
+		signal.dispatch();
+		expect(signalSpy).toHaveBeenDispatched(1);
 
-		signal.dispatch(1);
-		signal.dispatch(5);
-		signal.dispatch(1);
+		signalSpy.reset();
 
-		expect(signalSpy).toHaveBeenDispatched();
-		expect(signalSpy).toHaveBeenDispatched(2);
+		signal.dispatch();
+		expect(signalSpy).toHaveBeenDispatched(1);
 	});
 });
 

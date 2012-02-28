@@ -18,8 +18,30 @@ var spyOnSignal = jasmine.signals.spyOnSignal;
 jasmine.signals.matchers = {
 	toHaveBeenDispatched: function (expectedCount) {
 		if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
-			throw new Error('Expected a spy');
+			throw new Error('Expected a SignalSpy');
 		}
+		if (expectedCount === undefined) {
+			return this.actual.count > 0;
+		} else {
+			return this.actual.count === expectedCount;
+		}
+	},
+	toHaveBeenDispatchedMatching: function (matcher, expectedCount) {
+		if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
+			throw new Error('Expected a SignalSpy');
+		}
+		
+		if (expectedCount === undefined) {
+			return this.actual.count > 0;
+		} else {
+			return this.actual.count === expectedCount;
+		}
+	},
+	toHaveBeenDispatchedWith: function () {
+		if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
+			throw new Error('Expected a SignalSpy');
+		}
+		
 		if (expectedCount === undefined) {
 			return this.actual.count > 0;
 		} else {
@@ -42,7 +64,7 @@ beforeEach(function () {
 			throw 'spyOnSignal requires a signal as a parameter';
 		}
 		this.signal = signal;
-		this.matcher = matcher  || allSignalsMatcher;
+		this.matcher = matcher || allSignalsMatcher;
 		this.count = 0;
 		this.initialize();
 	};
@@ -63,7 +85,6 @@ beforeEach(function () {
 
 	namespace.SignalSpy.prototype.reset = function () {
 		this.count = 0;
-		this.matcher = allSignalsMatcher;
 	};
 
 	namespace.SignalSpy.prototype.matching = function (predicate) {
