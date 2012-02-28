@@ -5,7 +5,7 @@
 */
 
 jasmine.signals.spyOnSignal = function (signal, matcher) {
-	var spy = new jasmine.signals.SignalInfo(signal, matcher);
+	var spy = new jasmine.signals.SignalSpy(signal, matcher);
 	return spy;
 };
 
@@ -17,7 +17,7 @@ var spyOnSignal = jasmine.signals.spyOnSignal;
 
 jasmine.signals.matchers = {
 	toHaveBeenDispatched: function (expectedCount) {
-		if (!(this.actual instanceof jasmine.signals.SignalInfo)) {
+		if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
 			throw new Error('Expected a spy');
 		}
 		if (expectedCount === undefined) {
@@ -37,7 +37,7 @@ beforeEach(function () {
  */
 
 (function(namespace) {
-	namespace.SignalInfo = function (signal, matcher) {
+	namespace.SignalSpy = function (signal, matcher) {
 		if (!(signal instanceof signals.Signal)) {
 			throw 'spyOnSignal requires a signal as a parameter';
 		}
@@ -51,7 +51,7 @@ beforeEach(function () {
 		return true;
 	}
 
-	namespace.SignalInfo.prototype.initialize = function () {
+	namespace.SignalSpy.prototype.initialize = function () {
 		this.signal.add(onSignal, this);
 
 		function onSignal(parameters) {
@@ -61,17 +61,17 @@ beforeEach(function () {
 		};
 	};
 
-	namespace.SignalInfo.prototype.reset = function () {
+	namespace.SignalSpy.prototype.reset = function () {
 		this.count = 0;
 		this.matcher = allSignalsMatcher;
 	};
 
-	namespace.SignalInfo.prototype.matching = function (predicate) {
+	namespace.SignalSpy.prototype.matching = function (predicate) {
 		this.matcher = predicate;
 		return this;
 	};
 
-	namespace.SignalInfo.prototype.matchingValues = function () {
+	namespace.SignalSpy.prototype.matchingValues = function () {
 		var expectedArgs = arguments;
 		this.matcher = function () {
 			for (var i = 0; i < expectedArgs.length; i++) {
