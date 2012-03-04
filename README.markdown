@@ -55,6 +55,37 @@ expect(signalSpy).toHaveBeenDispatched(3); // expect signal to have been dispatc
 signalSpy.reset(); // reset the counter
 ```
 
+AMD
+-------------
+It's possible to use 'jasmine-signals' as an AMD (Asynchronous Module Definition) module.
+
+'jasmine-signals' depends on JS-Signals, so first define 'signals' path:
+
+```js
+require.config({
+	paths: {
+		signals: 'lib/js-signals/signals',
+		jasmineSignals: 'lib/jasmine-signals/jasmine-signals'
+	}
+});
+```
+
+Then use it in 'Jasmine' tests like this:
+
+```js
+define(['myClass', 'jasmineSignals'], function(myClass, jasmineSignals) {
+	var spyOnSignal = jasmineSignals.spyOnSignal;
+
+	it('should signal completed', function () {
+		var completedSpy = spyOnSignal(myClass.completed);
+
+		myClass.doSomething();
+
+		expect(spy).toHaveBeenDispatched();
+	});
+});
+```
+
 Examples
 --------
 Check the [spec](https://github.com/AdamNowotny/jasmine-signals/tree/master/spec) folder for full examples.
