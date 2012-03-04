@@ -57,7 +57,7 @@ signalSpy.reset(); // reset the counter
 
 AMD
 -------------
-It's possible to use 'jasmine-signals' as an AMD (Asynchronous Module Definition) module.
+It's possible to use `jasmine-signals` as an AMD (Asynchronous Module Definition) module.
 
 `jasmine-signals` depends on JS-Signals, so first define `signals` path:
 
