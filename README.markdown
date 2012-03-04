@@ -59,7 +59,7 @@ AMD
 -------------
 It's possible to use 'jasmine-signals' as an AMD (Asynchronous Module Definition) module.
 
-'jasmine-signals' depends on JS-Signals, so first define 'signals' path:
+`jasmine-signals` depends on JS-Signals, so first define `signals` path:
 
 ```js
 require.config({
@@ -70,7 +70,7 @@ require.config({
 });
 ```
 
-Then use it in 'Jasmine' tests like this:
+Then use it in `Jasmine` tests like this:
 
 ```js
 define(['myClass', 'jasmineSignals'], function(myClass, jasmineSignals) {
