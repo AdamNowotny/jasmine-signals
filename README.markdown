@@ -89,3 +89,7 @@ define(['myClass', 'jasmineSignals'], function(myClass, jasmineSignals) {
 Examples
 --------
 Check the [spec](https://github.com/AdamNowotny/jasmine-signals/tree/master/spec) folder for full examples.
+
+License
+-------
+This code is distributed under Apache License version 2.0
