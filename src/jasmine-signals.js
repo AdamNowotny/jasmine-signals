@@ -55,7 +55,8 @@
 			this.signal.add(onSignal, this);
 
 			function onSignal(parameters) {
-				if (this.matcher(parameters)) {
+                //fixes bug which prevented matching on multiple parameters
+                if (this.matcher.apply(this, [].splice.call(arguments, 0))){
 					this.count++;
 				}
 			}

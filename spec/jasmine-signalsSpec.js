@@ -113,6 +113,19 @@ describe('jasmine-signals', function() {
 			expect(signalSpy).toHaveBeenDispatched(2);
 		});
 
+
+        it('should spyOnSignal matching multiple values', function() {
+            var signal = new signals.Signal();
+            var signalSpy = spyOnSignal(signal).matchingValues(1,2);
+
+            signal.dispatch(1,2);
+            signal.dispatch(5);
+            signal.dispatch(1,2);
+
+            expect(signalSpy).toHaveBeenDispatched();
+            expect(signalSpy).toHaveBeenDispatched(2);
+        });
+
 	});
 
 });
