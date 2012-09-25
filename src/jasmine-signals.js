@@ -24,6 +24,18 @@
 			if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
 				throw new Error('Expected a SignalSpy');
 			}
+
+			this.message = function() {
+				var message = 'Expected ' + this.actual.signal.toString() + ' to have been dispatched';
+				if (expectedCount > 0) {
+					message += ' (' + expectedCount + ' times but was ' + this.actual.count + ')';
+				}
+				if (this.actual._matchingValuesMessage !== '') {
+					message += ' with ' + this.actual._paramCount + ' params: '  + this.actual._matchingValuesMessage;
+				}
+				return message;
+			};
+
 			if (expectedCount === undefined) {
 				return this.actual.count > 0;
 			} else {
@@ -44,6 +56,8 @@
 			this.signal = signal;
 			this.matcher = matcher || allSignalsMatcher;
 			this.count = 0;
+			this._matchingValuesMessage = '';
+			this._paramCount = 0;
 			this.initialize();
 		};
 
@@ -55,13 +69,10 @@
 			this.signal.add(onSignal, this);
 
 			function onSignal(parameters) {
-                //fixes bug which prevented matching on multiple parameters
-                if (this.matcher.apply(this, [].splice.call(arguments, 0))){
+				if (this.matcher.apply(this, [].splice.call(arguments, 0))){
 					this.count++;
 				}
 			}
-
-			;
 		};
 
 		namespace.SignalSpy.prototype.reset = function () {
@@ -75,10 +86,20 @@
 
 		namespace.SignalSpy.prototype.matchingValues = function () {
 			var expectedArgs = arguments;
+
 			this.matcher = function () {
+				if(this._matchingValuesMessage !== '') {
+					this._matchingValuesMessage += ", ";
+				}
+				this._paramCount = expectedArgs.length;
+
 				for (var i = 0; i < expectedArgs.length; i++) {
 					if (arguments[i] !== expectedArgs[i]) {
+						this._matchingValuesMessage += "(expected `" + expectedArgs[i] + "` but was `" + arguments[i] + "`)";
 						return false;
+					}
+					else{
+						this._matchingValuesMessage += "(`" + expectedArgs[i] + "` was `" + arguments[i] + "`)";
 					}
 				}
 				return true;
