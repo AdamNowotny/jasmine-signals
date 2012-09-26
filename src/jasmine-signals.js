@@ -13,8 +13,6 @@
 		return spy;
 	};
 
-	var spyOnSignal = jasmine.signals.spyOnSignal;
-
 	/*
 	* Matchers
 	*/
@@ -54,7 +52,7 @@
 				throw 'spyOnSignal requires a signal as a parameter';
 			}
 			this.signal = signal;
-			this.matcher = matcher || allSignalsMatcher;
+			this.signalMatcher = matcher || allSignalsMatcher;
 			this.count = 0;
 			this._matchingValuesMessage = '';
 			this._paramCount = 0;
@@ -66,13 +64,11 @@
 		}
 
 		namespace.SignalSpy.prototype.initialize = function () {
-			this.signal.add(onSignal, this);
-
-			function onSignal(parameters) {
-				if (this.matcher.apply(this, [].splice.call(arguments, 0))){
+			this.signal.add(function (parameters) {
+				if (this.signalMatcher.apply(this, [].splice.call(arguments, 0))){
 					this.count++;
 				}
-			}
+			}, this);
 		};
 
 		namespace.SignalSpy.prototype.reset = function () {
@@ -80,14 +76,14 @@
 		};
 
 		namespace.SignalSpy.prototype.matching = function (predicate) {
-			this.matcher = predicate;
+			this.signalMatcher = predicate;
 			return this;
 		};
 
 		namespace.SignalSpy.prototype.matchingValues = function () {
 			var expectedArgs = arguments;
 
-			this.matcher = function () {
+			this.signalMatcher = function () {
 				if(this._matchingValuesMessage !== '') {
 					this._matchingValuesMessage += ", ";
 				}
@@ -122,7 +118,7 @@
 		module.exports = jasmine.signals;
 	} else { // browser
 		// use string because of Google closure compiler ADVANCED_MODE
-		global['spyOnSignal'] = spyOnSignal;
+		global['spyOnSignal'] = jasmine.signals.spyOnSignal;
 		signals = global['signals'];
 	}
 
