@@ -1,5 +1,13 @@
 describe('jasmine-signals', function() {
 
+	var signal;
+	var spy;
+
+	beforeEach(function () {
+		signal = new signals.Signal();
+		spy = spyOnSignal(signal);
+	});
+
 	it('should fail if not spying on signal', function() {
 		expect(function() {
 			spyOnSignal({ });
@@ -19,19 +27,12 @@ describe('jasmine-signals', function() {
 	});
 
 	it('should subscribe to signal on spy', function() {
-		var signal = new signals.Signal();
-
-		spyOnSignal(signal);
-
 		expect(signal.getNumListeners()).toBe(1);
 	});
 
 	describe('toHaveBeenDispatched', function() {
 
 		it('should require expect to use spy', function() {
-			var signal = new signals.Signal();
-			var signalSpy = spyOnSignal(signal);
-
 			signal.dispatch();
 
 			expect(function() {
@@ -40,19 +41,13 @@ describe('jasmine-signals', function() {
 		});
 
 		it('should know if signal dispatched', function() {
-			var signal = new signals.Signal();
-			var signalSpy = spyOnSignal(signal);
-
 			signal.dispatch();
 
-			expect(signalSpy).toHaveBeenDispatched();
+			expect(spy).toHaveBeenDispatched();
 		});
 
 		it('should know if signal not dispatched', function() {
-			var signal = new signals.Signal();
-			var signalSpy = spyOnSignal(signal);
-
-			expect(signalSpy).not.toHaveBeenDispatched();
+			expect(spy).not.toHaveBeenDispatched();
 		});
 
 	});
@@ -60,23 +55,17 @@ describe('jasmine-signals', function() {
 	describe('toHaveBeenDispatched with count', function() {
 
 		it('should pass if dispatched specified number of times', function() {
-			var signal = new signals.Signal();
-			var signalSpy = spyOnSignal(signal);
-
 			signal.dispatch();
 			signal.dispatch();
 			signal.dispatch();
 
-			expect(signalSpy).toHaveBeenDispatched(3);
+			expect(spy).toHaveBeenDispatched(3);
 		});
 
 		it('should fail if signal count wrong', function() {
-			var signal = new signals.Signal();
-			var signalSpy = spyOnSignal(signal);
-
 			signal.dispatch();
 
-			expect(signalSpy).not.toHaveBeenDispatched(3);
+			expect(spy).not.toHaveBeenDispatched(3);
 		});
 
 	});
@@ -84,8 +73,7 @@ describe('jasmine-signals', function() {
 	describe('matching', function() {
 
 		it('should spyOnSignal with function matcher', function() {
-			var signal = new signals.Signal();
-			var signalSpy = spyOnSignal(signal).matching(function(signalInfo) {
+			spy.matching(function(signalInfo) {
 				return signalInfo === 1;
 			});
 
@@ -93,8 +81,8 @@ describe('jasmine-signals', function() {
 			signal.dispatch(5);
 			signal.dispatch(1);
 
-			expect(signalSpy).toHaveBeenDispatched();
-			expect(signalSpy).toHaveBeenDispatched(2);
+			expect(spy).toHaveBeenDispatched();
+			expect(spy).toHaveBeenDispatched(2);
 		});
 
 	});
@@ -102,29 +90,27 @@ describe('jasmine-signals', function() {
 	describe('matchingValues', function() {
 
 		it('should spyOnSignal matching values', function() {
-			var signal = new signals.Signal();
-			var signalSpy = spyOnSignal(signal).matchingValues(1);
+			spy.matchingValues(1);
 
 			signal.dispatch(1);
 			signal.dispatch(5);
 			signal.dispatch(1);
 
-			expect(signalSpy).toHaveBeenDispatched();
-			expect(signalSpy).toHaveBeenDispatched(2);
+			expect(spy).toHaveBeenDispatched();
+			expect(spy).toHaveBeenDispatched(2);
 		});
 
 
-        it('should spyOnSignal matching multiple values', function() {
-            var signal = new signals.Signal();
-            var signalSpy = spyOnSignal(signal).matchingValues('a','b');
+		it('should spyOnSignal matching multiple values', function() {
+			spy.matchingValues('a', 'b');
 
-            signal.dispatch('a',3);
-            signal.dispatch(5);
-            signal.dispatch('a','b');
+			signal.dispatch('a', 3);
+			signal.dispatch('a', 'b');
+			signal.dispatch(5);
 
-            expect(signalSpy).toHaveBeenDispatched();
-            expect(signalSpy).toHaveBeenDispatched(1);
-        });
+			expect(spy).toHaveBeenDispatched();
+			expect(spy).toHaveBeenDispatched(1);
+		});
 
 	});
 
