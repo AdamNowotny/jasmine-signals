@@ -49,12 +49,6 @@ expect(signalSpy).toHaveBeenDispatched();  // expect signal to have been dispatc
 expect(signalSpy).toHaveBeenDispatched(3); // expect signal to have been dispatched 3 times
 ```
 
-### Reset
-
-```js
-signalSpy.reset(); // reset the counter
-```
-
 AMD
 -------------
 It's possible to use `jasmine-signals` as an AMD (Asynchronous Module Definition) module.

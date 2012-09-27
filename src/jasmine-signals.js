@@ -79,10 +79,6 @@
 			}, this);
 		};
 
-		namespace.SignalSpy.prototype.reset = function () {
-			this.count = 0;
-		};
-
 		namespace.SignalSpy.prototype.matching = function (predicate) {
 			this.signalMatcher = predicate;
 			return this;
