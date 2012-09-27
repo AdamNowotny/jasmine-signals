@@ -19,21 +19,26 @@
 
 	jasmine.signals.matchers = {
 		toHaveBeenDispatched: function (expectedCount) {
-			if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
-				throw new Error('Expected a SignalSpy');
-			}
-
 			this.message = function() {
 				var message = 'Expected ' + this.actual.signal.toString() + ' to have been dispatched';
 				if (expectedCount > 0) {
-					message += ' (' + expectedCount + ' times but was ' + this.actual.count + ')';
+					message += ' ' + expectedCount + ' times but was ' + this.actual.count;
 				}
-				if (this.actual._matchingValuesMessage !== '') {
-					message += ' with ' + this.actual._paramCount + ' params: '  + this.actual._matchingValuesMessage;
+				if (this.actual.expectedArgs !== undefined) {
+					var dispatchMessage = '';
+					for (var i = 0; i < this.actual.totalCount; i++) {
+						if (!this.actual.signalMatcher(this.actual.dispatches[i])) {
+							dispatchMessage += '(' + this.actual.dispatches[i] + ')';
+						}
+					}
+					message += ' with (' + this.actual.expectedArgs.join(',') + ') but was with ' + dispatchMessage;
 				}
 				return message;
 			};
 
+			if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
+				throw new Error('Expected a SignalSpy');
+			}
 			if (expectedCount === undefined) {
 				return this.actual.count > 0;
 			} else {
@@ -54,8 +59,8 @@
 			this.signal = signal;
 			this.signalMatcher = matcher || allSignalsMatcher;
 			this.count = 0;
-			this._matchingValuesMessage = '';
-			this._paramCount = 0;
+			this.totalCount = 0;
+			this.dispatches = [];
 			this.initialize();
 		};
 
@@ -64,8 +69,11 @@
 		}
 
 		namespace.SignalSpy.prototype.initialize = function () {
-			this.signal.add(function (parameters) {
-				if (this.signalMatcher.apply(this, [].splice.call(arguments, 0))){
+			this.signal.add(function () {
+				var paramArray = (arguments.length) ? Array.prototype.slice.call(arguments) : [];
+				this.dispatches.push(paramArray);
+				this.totalCount++;
+				if (this.signalMatcher.apply(this, Array.prototype.slice.call(arguments))) {
 					this.count++;
 				}
 			}, this);
@@ -81,21 +89,11 @@
 		};
 
 		namespace.SignalSpy.prototype.matchingValues = function () {
-			var expectedArgs = arguments;
-
+			this.expectedArgs = Array.prototype.slice.call(arguments);
 			this.signalMatcher = function () {
-				if(this._matchingValuesMessage !== '') {
-					this._matchingValuesMessage += ", ";
-				}
-				this._paramCount = expectedArgs.length;
-
-				for (var i = 0; i < expectedArgs.length; i++) {
-					if (arguments[i] !== expectedArgs[i]) {
-						this._matchingValuesMessage += "(expected `" + expectedArgs[i] + "` but was `" + arguments[i] + "`)";
+				for (var i = 0; i < this.expectedArgs.length; i++) {
+					if (arguments[i] !== this.expectedArgs[i]) {
 						return false;
-					}
-					else{
-						this._matchingValuesMessage += "(`" + expectedArgs[i] + "` was `" + arguments[i] + "`)";
 					}
 				}
 				return true;

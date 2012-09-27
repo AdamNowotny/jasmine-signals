@@ -114,5 +114,41 @@ describe('jasmine-signals', function() {
 
 	});
 
+	describe('messages', function () {
+
+		it('should show message when signal expected', function () {
+			var expectParam = {
+				actual: spy
+			};
+
+			var messageFunction = jasmine.signals.matchers.toHaveBeenDispatched.apply(expectParam);
+
+			expect(expectParam.message()).toBe('Expected [Signal active:true numListeners:1] to have been dispatched');
+		});
+
+		it('should show message when signal expected with count', function () {
+			var expectParam = {
+				actual: spy
+			};
+
+			var messageFunction = jasmine.signals.matchers.toHaveBeenDispatched.apply(expectParam, [2]);
+
+			expect(expectParam.message()).toBe('Expected [Signal active:true numListeners:1] to have been dispatched 2 times but was 0');
+		});
+
+		it('should show message when signal expected with matching values', function () {
+			spy.matchingValues(1, 2);
+			signal.dispatch(3, 4);
+			signal.dispatch(5, 6);
+			var expectParam = {
+				actual: spy
+			};
+
+			var messageFunction = jasmine.signals.matchers.toHaveBeenDispatched.apply(expectParam);
+
+			expect(expectParam.message()).toBe('Expected [Signal active:true numListeners:1] to have been dispatched with (1,2) but was with (3,4)(5,6)');
+		});
+
+	});
 });
 
