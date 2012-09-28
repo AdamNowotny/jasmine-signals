@@ -20,9 +20,12 @@
 	jasmine.signals.matchers = {
 		toHaveBeenDispatched: function (expectedCount) {
 			this.message = function() {
-				var message = 'Expected ' + this.actual.signal.toString() + ' to have been dispatched';
+				var not = this.isNot ? ' not' : '';
+				var message = 'Expected ' + this.actual.signal.toString() + not + ' to have been dispatched';
 				if (expectedCount > 0) {
-					message += ' ' + expectedCount + ' times but was ' + this.actual.count;
+					message += (this.isNot) ?
+						' ' + expectedCount + ' times' :
+						' ' + expectedCount + ' times but was ' + this.actual.count;
 				}
 				if (this.actual.expectedArgs !== undefined) {
 					var dispatchMessage = '';
