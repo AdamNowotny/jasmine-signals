@@ -17,8 +17,8 @@ var signal = new signals.Signal();
 var signalSpy = spyOnSignal(signal);
 ```
 
-### Specific parameters using predicate
-You can also pass a boolean function to specify which dispatches to count.
+### Filtering signals
+You can pass a boolean function to specify which dispatches to register.
 
 ```js
 var signal = new signals.Signal();
