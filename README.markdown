@@ -76,6 +76,7 @@ Check the [spec](https://github.com/AdamNowotny/jasmine-signals/tree/master/spec
 Contributors
 ------------
 [Adam Nowotny](https://github.com/AdamNowotny)
+
 [Gavin Jackson](https://github.com/gavJackson)
 
 License
