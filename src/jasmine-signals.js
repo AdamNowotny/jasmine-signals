@@ -47,8 +47,48 @@
 			} else {
 				return this.actual.count === expectedCount;
 			}
+		},
+		toHaveBeenDispatchedWith: function () {
+			this.message = function() {
+				var not = this.isNot ? ' not' : '';
+				var message = 'Expected ' + this.actual.signal.toString() + not + ' to have been dispatched';
+				if (this.actual.expectedArgs !== undefined || params.length > 0) {
+					var dispatchMessage = '';
+					for (var i = 0; i < this.actual.totalCount; i++) {
+						if (!this.actual.signalMatcher(this.actual.dispatches[i])) {
+							dispatchMessage += '(' + this.actual.dispatches[i] + ')';
+						}
+					}
+					var paramString = (this.actual.expectedArgs) ?
+						this.actual.expectedArgs.join(',') :
+						params.join(',');
+					message += ' with (' + paramString + ') but was with ' + dispatchMessage;
+				}
+				return message;
+			};
+
+			if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
+				throw new Error('Expected a SignalSpy');
+			}
+			var params = Array.prototype.slice.call(arguments);
+			for (var i = 0; i < this.actual.totalCount; i++) {
+				var signalRegistered = this.actual.signalMatcher(this.actual.dispatches[i]);
+				if (signalRegistered && paramsMatch(this.actual.dispatches[i], params)) {
+					return !this.isNot;
+				}
+			}
+			return false;
 		}
 	};
+
+	function paramsMatch(p1, p2) {
+		for (var i = p1.length - 1; i >= 0; i--) {
+			if (p1[i] !== p2[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/*
 	* Spy implementation
@@ -87,15 +127,11 @@
 			return this;
 		};
 
+		// obsolete: use expect(...).haveBeenDispatchedWith(...)
 		namespace.SignalSpy.prototype.matchingValues = function () {
 			this.expectedArgs = Array.prototype.slice.call(arguments);
 			this.signalMatcher = function () {
-				for (var i = 0; i < this.expectedArgs.length; i++) {
-					if (arguments[i] !== this.expectedArgs[i]) {
-						return false;
-					}
-				}
-				return true;
+				return paramsMatch(this.expectedArgs, arguments);
 			};
 			return this;
 		};

@@ -23,22 +23,10 @@ You can also pass a boolean function to specify which dispatches to count.
 ```js
 var signal = new signals.Signal();
 var signalSpy = spyOnSignal(signal).matching(function (dispatchInfo) {
-	return dispatchInfo === 5;
+	return dispatchInfo !== null;
 });
-```
-
-This will only look at signals dispatched like this:
-
-```js
-signal.dispatch(5);
-```
-
-### Specific parameter values
-You can simplify the above using:
-
-```js
-var signal = new signals.Signal();
-var signalSpy = spyOnSignal(signal).matchingValues(5);
+signal.dispatch();  // ignored
+signal.dispatch(5); // registered
 ```
 
 ### Expectations
@@ -47,6 +35,7 @@ After defining the spy you can set expectations in your spec.
 ```js
 expect(signalSpy).toHaveBeenDispatched();  // expect signal to have been dispatched at least once
 expect(signalSpy).toHaveBeenDispatched(3); // expect signal to have been dispatched 3 times
+expect(signalSpy).toHaveBeenDispatchedWith(1, 5); // expect signal to have been dispatched with parameters
 ```
 
 AMD
@@ -86,6 +75,7 @@ Check the [spec](https://github.com/AdamNowotny/jasmine-signals/tree/master/spec
 
 Contributors
 ------------
+[Adam Nowotny](https://github.com/AdamNowotny)
 [Gavin Jackson](https://github.com/gavJackson)
 
 License

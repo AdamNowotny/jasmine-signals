@@ -70,6 +70,52 @@ describe('jasmine-signals', function() {
 
 	});
 
+	describe('toHaveBeenDispatchedWith', function() {
+
+		it('should require expect to use spy', function() {
+			signal.dispatch();
+
+			expect(function() {
+				expect(signal).toHaveBeenDispatchedWith();
+			}).toThrow(new Error('Expected a SignalSpy'));
+		});
+
+		it('should know if signal dispatched with parameters', function() {
+			var expectParam = {
+				actual: spy,
+				isNot: false
+			};
+
+			expect(jasmine.signals.matchers.toHaveBeenDispatchedWith.apply(expectParam, [2, 6])).toBe(false);
+		});
+
+		it('should know if signal not dispatched with parameters', function() {
+			var expectParam = {
+				actual: spy,
+				isNot: true
+			};
+			
+			signal.dispatch(1, 5);
+
+			expect(jasmine.signals.matchers.toHaveBeenDispatchedWith.apply(expectParam, [2, 6])).toBe(false);
+		});
+
+		it('should know if signal dispatched with parameters', function() {
+			signal.dispatch(1, 5);
+			signal.dispatch(2, 6);
+
+			expect(spy).toHaveBeenDispatchedWith(1, 5);
+			expect(spy).toHaveBeenDispatchedWith(2, 6);
+		});
+
+		it('should know if signal not dispatched', function() {
+			signal.dispatch(1, 5);
+
+			expect(spy).not.toHaveBeenDispatchedWith(2, 3);
+		});
+
+	});
+
 	describe('matching', function() {
 
 		it('should spyOnSignal with function matcher', function() {
