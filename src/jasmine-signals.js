@@ -18,67 +18,59 @@
 	* Matchers
 	*/
 
+	function actualToString(spy) {
+		return spy.dispatches.map(function (d) {
+			return '(' + d + ')';
+		}).join('');
+	}
+
 	jasmine.signals.matchers = {
 		toHaveBeenDispatched: function (expectedCount) {
 			this.message = function() {
 				var not = this.isNot ? ' not' : '';
-				var message = 'Expected ' + this.actual.signal.toString() + not + ' to have been dispatched';
+				var message = 'Expected ' + spy.signal.toString() + not + ' to have been dispatched';
 				if (expectedCount > 0) {
-					message += (this.isNot) ?
-						' ' + expectedCount + ' times' :
-						' ' + expectedCount + ' times but was ' + this.actual.count;
+					message += ' ' + expectedCount + ' times but was ' + spy.count;
 				}
 				if (this.actual.expectedArgs !== undefined) {
-					var dispatchMessage = '';
-					for (var i = 0; i < this.actual.totalCount; i++) {
-						if (!this.actual.signalMatcher(this.actual.dispatches[i])) {
-							dispatchMessage += '(' + this.actual.dispatches[i] + ')';
-						}
-					}
-					message += ' with (' + this.actual.expectedArgs.join(',') + ') but was with ' + dispatchMessage;
+					message += ' with (' + spy.expectedArgs.join(',') + ')';
+					message += ' but was with ' + actualToString(spy);
 				}
 				return message;
 			};
 
-			if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
+			var spy = getSpy(this.actual);
+			if (!(spy instanceof jasmine.signals.SignalSpy)) {
 				throw new Error('Expected a SignalSpy');
 			}
 			if (expectedCount === undefined) {
-				return this.actual.count > 0;
+				return spy.count > 0;
 			} else {
-				return this.actual.count === expectedCount;
+				return spy.count === expectedCount;
 			}
 		},
 		toHaveBeenDispatchedWith: function () {
 			this.message = function() {
 				var not = this.isNot ? ' not' : '';
-				var message = 'Expected ' + this.actual.signal.toString() + not + ' to have been dispatched';
-				if (this.actual.expectedArgs !== undefined || params.length > 0) {
-					var dispatchMessage = '';
-					for (var i = 0; i < this.actual.totalCount; i++) {
-						if (!this.actual.signalMatcher(this.actual.dispatches[i])) {
-							dispatchMessage += '(' + this.actual.dispatches[i] + ')';
-						}
-					}
-					var paramString = (this.actual.expectedArgs) ?
-						this.actual.expectedArgs.join(',') :
-						params.join(',');
-					message += ' with (' + paramString + ') but was with ' + dispatchMessage;
+				var message = 'Expected ' + spy.signal.toString() + not + ' to have been dispatched';
+				if (params || spy.expectedArgs !== undefined) {
+					var args = params || [];
+					message += ' with (' + args.join(',') + ')';
+					message += ' but was with ' + actualToString(spy);
 				}
 				return message;
 			};
 
-			if (!(this.actual instanceof jasmine.signals.SignalSpy)) {
+			var spy = getSpy(this.actual);
+			if (!(spy instanceof jasmine.signals.SignalSpy)) {
 				throw new Error('Expected a SignalSpy');
 			}
 			var params = Array.prototype.slice.call(arguments);
-			for (var i = 0; i < this.actual.totalCount; i++) {
-				var signalRegistered = this.actual.signalMatcher(this.actual.dispatches[i]);
-				if (signalRegistered && paramsMatch(this.actual.dispatches[i], params)) {
-					return !this.isNot;
-				}
-			}
-			return false;
+			return spy.dispatches.filter(spy.signalMatcher).map(function (d) {
+				return (paramsMatch(d, params)) ? !this.isNot : false;
+			}).reduce(function (a, b) {
+				return a || b;
+			}, false);
 		}
 	};
 
@@ -89,6 +81,15 @@
 			}
 		}
 		return true;
+	}
+
+	function getSpy(actual) {
+		if (actual instanceof signals.Signal) {
+			return spies.filter(function spiesForSignal(d) {
+				return d.signal === actual;
+			})[0];
+		}
+		return actual;
 	}
 
 	/*

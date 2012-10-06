@@ -36,15 +36,13 @@ describe('jasmine-signals', function() {
 		expect(signal.getNumListeners()).toBe(0);
 	});
 
+	it('should accept signal in expectations', function () {
+		signal.dispatch();
+
+		expect(signal).toHaveBeenDispatched();
+	});
+
 	describe('toHaveBeenDispatched', function() {
-
-		it('should require expect to use spy', function() {
-			signal.dispatch();
-
-			expect(function() {
-				expect(signal).toHaveBeenDispatched();
-			}).toThrow(new Error('Expected a SignalSpy'));
-		});
 
 		it('should know if signal dispatched', function() {
 			signal.dispatch();
@@ -73,14 +71,6 @@ describe('jasmine-signals', function() {
 	});
 
 	describe('toHaveBeenDispatchedWith', function() {
-
-		it('should require expect to use spy', function() {
-			signal.dispatch();
-
-			expect(function() {
-				expect(signal).toHaveBeenDispatchedWith();
-			}).toThrow(new Error('Expected a SignalSpy'));
-		});
 
 		it('should know if signal dispatched with parameters', function() {
 			var expectParam = {
@@ -162,7 +152,7 @@ describe('jasmine-signals', function() {
 
 	});
 
-	describe('messages', function () {
+	describe('toHaveBeenDispatched messages', function () {
 
 		it('should show message when signal expected', function () {
 			var expectParam = {
@@ -206,7 +196,7 @@ describe('jasmine-signals', function() {
 
 			var messageFunction = jasmine.signals.matchers.toHaveBeenDispatched.apply(expectParam, [2]);
 
-			expect(expectParam.message()).toBe('Expected [Signal active:true numListeners:1] not to have been dispatched 2 times');
+			expect(expectParam.message()).toBe('Expected [Signal active:true numListeners:1] not to have been dispatched 2 times but was 2');
 		});
 
 		it('should show message when signal expected with matching values', function () {
@@ -237,5 +227,20 @@ describe('jasmine-signals', function() {
 		});
 
 	});
+
+	describe('toHaveBeenDispatchedWith messages', function () {
+		it('should show message when signal expected with matching values', function () {
+			signal.dispatch(3, 4);
+			signal.dispatch(5, 6);
+			var expectParam = {
+				actual: spy
+			};
+
+			var messageFunction = jasmine.signals.matchers.toHaveBeenDispatchedWith.apply(expectParam, [1, 2]);
+
+			expect(expectParam.message()).toBe('Expected [Signal active:true numListeners:1] to have been dispatched with (1,2) but was with (3,4)(5,6)');
+		});
+	});
+
 });
 

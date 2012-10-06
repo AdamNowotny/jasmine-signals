@@ -2,14 +2,14 @@ jasmine-signals
 ================
 `jasmine-signals` is a [Jasmine](https://github.com/pivotal/jasmine) matcher extension that simplifies writing specs for components using [JS-Signals](http://millermedeiros.github.com/js-signals/).
 
-The matchers can be used to count how many times specified signal has been dispatched.
-
-You can also restrict which signal dispatches to count.
+Adds to expectations to Jasmine:
+ * toHaveBeenDispatched
+ * toHaveBeenDispatchedWith
 
 How to use
 --------------
 
-### Signal spies
+### Create
 First define which signal you're interested in.
 
 ```js
@@ -17,8 +17,13 @@ var signal = new signals.Signal();
 var signalSpy = spyOnSignal(signal);
 ```
 
+<<<<<<< HEAD
 ### Filtering signals
 You can pass a boolean function to specify which dispatches to register.
+=======
+### Filter
+You can pass a boolean function to specify which signal dispatches to count.
+>>>>>>> allow passing signal to expectation
 
 ```js
 var signal = new signals.Signal();
@@ -34,6 +39,7 @@ After defining the spy you can set expectations in your spec.
 
 ```js
 expect(signalSpy).toHaveBeenDispatched();  // expect signal to have been dispatched at least once
+expect(signal).toHaveBeenDispatched(); // passing signal is also allowed, first spy will be used
 expect(signalSpy).toHaveBeenDispatched(3); // expect signal to have been dispatched 3 times
 expect(signalSpy).toHaveBeenDispatchedWith(1, 5); // expect signal to have been dispatched with parameters
 ```
@@ -60,11 +66,11 @@ define(['myClass', 'jasmineSignals'], function(myClass, jasmineSignals) {
 	var spyOnSignal = jasmineSignals.spyOnSignal;
 
 	it('should signal completed', function () {
-		var completedSpy = spyOnSignal(myClass.completed);
+		spyOnSignal(myClass.completed);
 
 		myClass.doSomething();
 
-		expect(spy).toHaveBeenDispatched();
+		expect(myClass.completed).toHaveBeenDispatched();
 	});
 });
 ```
