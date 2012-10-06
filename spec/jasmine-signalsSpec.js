@@ -30,6 +30,12 @@ describe('jasmine-signals', function() {
 		expect(signal.getNumListeners()).toBe(1);
 	});
 
+	it('should unsubscribe from signal on stop', function() {
+		spy.stop();
+		
+		expect(signal.getNumListeners()).toBe(0);
+	});
+
 	describe('toHaveBeenDispatched', function() {
 
 		it('should require expect to use spy', function() {
@@ -49,10 +55,6 @@ describe('jasmine-signals', function() {
 		it('should know if signal not dispatched', function() {
 			expect(spy).not.toHaveBeenDispatched();
 		});
-
-	});
-
-	describe('toHaveBeenDispatched with count', function() {
 
 		it('should pass if dispatched specified number of times', function() {
 			signal.dispatch();

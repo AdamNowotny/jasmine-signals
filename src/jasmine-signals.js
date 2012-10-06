@@ -1,6 +1,6 @@
 ﻿(function (global) {
 
-	var signals;
+	var spies = [];
 
 	jasmine.signals = {};
 
@@ -10,6 +10,7 @@
 
 	jasmine.signals.spyOnSignal = function (signal, matcher) {
 		var spy = new jasmine.signals.SignalSpy(signal, matcher);
+		spies.push(spy);
 		return spy;
 	};
 
@@ -112,14 +113,20 @@
 		}
 
 		namespace.SignalSpy.prototype.initialize = function () {
-			this.signal.add(function () {
-				var paramArray = (arguments.length) ? Array.prototype.slice.call(arguments) : [];
-				this.dispatches.push(paramArray);
-				this.totalCount++;
-				if (this.signalMatcher.apply(this, Array.prototype.slice.call(arguments))) {
-					this.count++;
-				}
-			}, this);
+			this.signal.add(onSignal, this);
+		};
+
+		function onSignal() {
+			var paramArray = (arguments.length) ? Array.prototype.slice.call(arguments) : [];
+			this.dispatches.push(paramArray);
+			this.totalCount++;
+			if (this.signalMatcher.apply(this, Array.prototype.slice.call(arguments))) {
+				this.count++;
+			}
+		}
+
+		namespace.SignalSpy.prototype.stop = function () {
+			this.signal.remove(onSignal, this);
 		};
 
 		namespace.SignalSpy.prototype.matching = function (predicate) {
@@ -139,6 +146,13 @@
 
 	beforeEach(function () {
 		this.addMatchers(jasmine.signals.matchers);
+	});
+
+	afterEach(function () {
+		spies.forEach(function (d) {
+			d.stop();
+		});
+		spies = [];
 	});
 
 	// exports to multiple environments
