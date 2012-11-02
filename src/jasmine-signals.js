@@ -43,11 +43,9 @@
 			if (!(spy instanceof jasmine.signals.SignalSpy)) {
 				throw new Error('Expected a SignalSpy');
 			}
-			if (expectedCount === undefined) {
-				return spy.count > 0;
-			} else {
-				return spy.count === expectedCount;
-			}
+			return (expectedCount === undefined) ?
+				!!(spy.count) :
+				spy.count === expectedCount;
 		},
 		toHaveBeenDispatchedWith: function () {
 			this.message = function() {
@@ -104,7 +102,6 @@
 			this.signal = signal;
 			this.signalMatcher = matcher || allSignalsMatcher;
 			this.count = 0;
-			this.totalCount = 0;
 			this.dispatches = [];
 			this.initialize();
 		};
@@ -120,7 +117,6 @@
 		function onSignal() {
 			var paramArray = (arguments.length) ? Array.prototype.slice.call(arguments) : [];
 			this.dispatches.push(paramArray);
-			this.totalCount++;
 			if (this.signalMatcher.apply(this, Array.prototype.slice.call(arguments))) {
 				this.count++;
 			}
@@ -132,6 +128,12 @@
 
 		namespace.SignalSpy.prototype.matching = function (predicate) {
 			this.signalMatcher = predicate;
+			return this;
+		};
+
+		// backward compatibility, deprecated: split your tests
+		namespace.SignalSpy.prototype.reset = function () {
+			this.count = 0;
 			return this;
 		};
 
