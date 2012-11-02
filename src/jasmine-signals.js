@@ -14,6 +14,8 @@
 		return spy;
 	};
 
+	jasmine.signals.spyOnSignal.spyOnSignal = jasmine.signals.spyOnSignal;
+	
 	/*
 	* Matchers
 	*/
@@ -162,10 +164,10 @@
 	if (typeof define === 'function' && define.amd) { // AMD
 		define(['signals'], function (amdSignals) {
 			signals = amdSignals;
-			return jasmine.signals;
+			return jasmine.signals.spyOnSignal;
 		});
 	} else if (typeof module !== 'undefined' && module.exports) { // node
-		module.exports = jasmine.signals;
+		module.exports = jasmine.signals.spyOnSignal;
 	} else { // browser
 		// use string because of Google closure compiler ADVANCED_MODE
 		global['spyOnSignal'] = jasmine.signals.spyOnSignal;
