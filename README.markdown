@@ -1,4 +1,4 @@
-jasmine-signals
+jasmine-signals[![Build Status](https://secure.travis-ci.org/AdamNowotny/jasmine-signals.png)](http://travis-ci.org/AdamNowotny/jasmine-signals)
 ================
 `jasmine-signals` is a [Jasmine](https://github.com/pivotal/jasmine) matcher extension that simplifies writing specs for components using [JS-Signals](http://millermedeiros.github.com/js-signals/).
 
