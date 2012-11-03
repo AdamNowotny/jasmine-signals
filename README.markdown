@@ -78,6 +78,7 @@ Install node.js, bower (`npm install bower -g`), get sources from git
 ```js
 bower update
 ```
+Open `SpecRunner.html` in the browser to run the tests.
 
 Contributors
 ------------
