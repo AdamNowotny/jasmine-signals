@@ -6,7 +6,7 @@ Adds new matchers to Jasmine:
  * toHaveBeenDispatched
  * toHaveBeenDispatchedWith
 
-How to use
+ How to use
 --------------
 
 ### Create
@@ -48,8 +48,8 @@ It's possible to use `jasmine-signals` as an AMD (Asynchronous Module Definition
 ```js
 require.config({
 	paths: {
-		signals: 'lib/js-signals/signals',
-		jasmineSignals: 'lib/jasmine-signals/jasmine-signals'
+		signals: 'components/js-signals/signals',
+		jasmineSignals: 'components/jasmine-signals/jasmine-signals'
 	}
 });
 ```
@@ -70,7 +70,14 @@ define(['myClass', 'jasmineSignals'], function(myClass, spyOnSignal) {
 
 Examples
 --------
-Check the [spec](https://github.com/AdamNowotny/jasmine-signals/tree/master/spec) folder for full examples.
+Just look at the specs: [jasmine-signalsSpec.js](https://github.com/AdamNowotny/jasmine-signals/tree/master/jasmine-signalsSpec.js)
+
+Development
+-----------
+Install node.js, bower (`npm install bower -g`), get sources from git
+```js
+bower update
+```
 
 Contributors
 ------------
