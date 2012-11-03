@@ -5,3 +5,5 @@ _ReSharper.*
 .DS_Store
 .idea/*
 components/*
+node_modules/*
+_SpecRunner.html

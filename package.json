@@ -1,0 +1,34 @@
+{
+	"name": "jasmine-signals",
+	"description": "Jasmine extension that simplifies writing specs for components using js-signals",
+	"version": "0.1.0",
+	"homepage": "https://github.com/AdamNowotny/jasmine-signals",
+	"author": {
+		"name": "Adam Nowotny",
+		"url": "http://github.com/AdamNowotny"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/AdamNowotny/jasmine-signals.git"
+	},
+	"bugs": {
+		"url": "https://github.com/AdamNowotny/jasmine-signals/issues"
+	},
+	"licenses": [
+		{
+			"type": "Apache",
+			"url": "https://github.com/AdamNowotny/jasmine-signals/blob/master/LICENSE"
+		}
+	],
+	"engines": {
+		"node": ">= 0.8.0"
+	},
+	"scripts": {
+		"test": "grunt travis --verbose"
+	},
+	"dependencies": {
+		"grunt": "~0.3.x",
+		"grunt-jsvalidate": "~0.1.3",
+		"grunt-jasmine-runner": "~0.6.0"
+	}
+}

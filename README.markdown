@@ -81,6 +81,7 @@ Development
 -----------
 Install node.js, [bower](http://twitter.github.com/bower), get sources from git
 ```js
+npm update
 bower update
 ```
 Open `SpecRunner.html` in the browser to run the tests.
