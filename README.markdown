@@ -17,7 +17,6 @@ var signal = new signals.Signal();
 var signalSpy = spyOnSignal(signal);
 ```
 
-<<<<<<< HEAD
 ### Filtering signals
 You can pass a boolean function to specify which dispatches to register.
 =======
@@ -40,8 +39,8 @@ After defining the spy you can set expectations in your spec.
 ```js
 expect(signalSpy).toHaveBeenDispatched();  // expect signal to have been dispatched at least once
 expect(signal).toHaveBeenDispatched(); // passing signal is also allowed, first spy will be used
-expect(signalSpy).toHaveBeenDispatched(3); // expect signal to have been dispatched 3 times
-expect(signalSpy).toHaveBeenDispatchedWith(1, 5); // expect signal to have been dispatched with parameters
+expect(signal).toHaveBeenDispatched(3); // expect signal to have been dispatched 3 times
+expect(signal).toHaveBeenDispatchedWith(1, 5); // expect signal to have been dispatched with parameters
 ```
 
 AMD
@@ -62,9 +61,7 @@ require.config({
 Then use it in `Jasmine` tests like this:
 
 ```js
-define(['myClass', 'jasmineSignals'], function(myClass, jasmineSignals) {
-	var spyOnSignal = jasmineSignals.spyOnSignal;
-
+define(['myClass', 'jasmineSignals'], function(myClass, spyOnSignal) {
 	it('should signal completed', function () {
 		spyOnSignal(myClass.completed);
 
