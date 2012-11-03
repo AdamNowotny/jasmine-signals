@@ -2,7 +2,7 @@ jasmine-signals
 ================
 `jasmine-signals` is a [Jasmine](https://github.com/pivotal/jasmine) matcher extension that simplifies writing specs for components using [JS-Signals](http://millermedeiros.github.com/js-signals/).
 
-Adds to expectations to Jasmine:
+Adds new matchers to Jasmine:
  * toHaveBeenDispatched
  * toHaveBeenDispatchedWith
 
@@ -19,10 +19,6 @@ var signalSpy = spyOnSignal(signal);
 
 ### Filtering signals
 You can pass a boolean function to specify which dispatches to register.
-=======
-### Filter
-You can pass a boolean function to specify which signal dispatches to count.
->>>>>>> allow passing signal to expectation
 
 ```js
 var signal = new signals.Signal();
