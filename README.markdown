@@ -6,8 +6,13 @@ Adds new matchers to Jasmine:
  * toHaveBeenDispatched
  * toHaveBeenDispatchedWith
 
- How to use
+How to use
 --------------
+### Installation
+```js
+bower install jasmine-signals
+```
+or just copy [jasmine-signals.js](https://raw.github.com/AdamNowotny/jasmine-signals/master/jasmine-signals.js) to wherever you like.
 
 ### Create
 First define which signal you're interested in.
@@ -74,7 +79,7 @@ Just look at the specs: [jasmine-signalsSpec.js](https://github.com/AdamNowotny/
 
 Development
 -----------
-Install node.js, bower (`npm install bower -g`), get sources from git
+Install node.js, [bower](http://twitter.github.com/bower), get sources from git
 ```js
 bower update
 ```
