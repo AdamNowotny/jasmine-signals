@@ -1,7 +1,7 @@
 {
 	"name": "jasmine-signals",
 	"description": "Jasmine extension that simplifies writing specs for components using js-signals",
-	"version": "0.1.0",
+	"version": "0.1.0-1",
 	"main": "./jasmine-signals.js",
 	"dependencies": {
 		"js-signals": "git://github.com/millermedeiros/js-signals.git"
