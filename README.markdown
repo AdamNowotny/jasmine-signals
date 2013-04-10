@@ -14,6 +14,8 @@ bower install jasmine-signals
 ```
 or just copy [jasmine-signals.js](https://raw.github.com/AdamNowotny/jasmine-signals/master/jasmine-signals.js) to wherever you like.
 
+The library uses some methods not available in old versions of IE (forEach, map, filter), so you might need to include [es5-shim](https://github.com/kriskowal/es5-shim) as well.
+
 ### Create
 First define which signal you're interested in.
 
