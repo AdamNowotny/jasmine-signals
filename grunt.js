@@ -16,7 +16,8 @@ module.exports = function (grunt) {
 			specs: 'jasmine-signalsSpec.js',
 			phantomjs : {
 				'ignore-ssl-errors' : true
-			}
+			},
+			helpers: [ 'components/es5-shim/es5-shim.min.js' ]
 		}
 	});
 };
