@@ -86,7 +86,7 @@ Install node.js, [bower](http://twitter.github.com/bower), get sources from git
 npm update
 bower update
 ```
-Open `SpecRunner.html` in the browser to run the tests.
+`grunt` or `grunt jasmine-server` to run the tests.
 
 Contributors
 ------------
