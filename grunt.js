@@ -3,17 +3,13 @@ module.exports = function (grunt) {
 
 	'use strict';
 
-	grunt.loadNpmTasks('grunt-jsvalidate');
 	grunt.loadNpmTasks('grunt-jasmine-runner');
 
-	grunt.registerTask('default', 'jsvalidate lint jasmine');
+	grunt.registerTask('default', 'lint jasmine');
 
 	grunt.initConfig({
 		lint: {
 			files: [ '*.js' ]
-		},
-		jsvalidate: {
-			files: ['*.js']
 		},
 		jasmine: {
 			src: [ 'jasmine-signals.js', 'components/js-signals/dist/signals.js' ],
