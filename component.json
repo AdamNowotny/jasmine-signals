@@ -4,8 +4,7 @@
   "version": "0.1.0-1",
   "main": "./jasmine-signals.js",
   "dependencies": {
-    "js-signals": "git://github.com/millermedeiros/js-signals.git",
-    "es5-shim": "~2.0.8"
+    "js-signals": "git://github.com/millermedeiros/js-signals.git"
   },
   "homepage": "https://github.com/AdamNowotny/jasmine-signals",
   "author": {
