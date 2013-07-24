@@ -75,6 +75,9 @@
 	};
 
 	function paramsMatch(p1, p2) {
+		if (p1.length !== p2.length) {
+			return false;
+		}
 		for (var i = p1.length - 1; i >= 0; i--) {
 			if (p1[i] !== p2[i]) {
 				return false;

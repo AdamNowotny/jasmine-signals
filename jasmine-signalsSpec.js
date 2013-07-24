@@ -106,6 +106,12 @@ describe('jasmine-signals', function() {
 			expect(spy).not.toHaveBeenDispatchedWith(2, 3);
 		});
 
+		it('should know if signal dispatched with same parameters', function() {
+			signal.dispatch(1);
+
+			expect(spy).not.toHaveBeenDispatchedWith(1, 5);
+		});
+
 	});
 
 	describe('matching', function() {
