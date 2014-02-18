@@ -12,12 +12,12 @@ module.exports = function (grunt) {
 			files: [ '*.js' ]
 		},
 		jasmine: {
-			src: [ 'jasmine-signals.js', 'components/js-signals/dist/signals.js' ],
+			src: [ 'jasmine-signals.js', 'bower_components/js-signals/dist/signals.js' ],
 			specs: 'jasmine-signalsSpec.js',
 			phantomjs : {
 				'ignore-ssl-errors' : true
 			},
-			helpers: [ 'components/es5-shim/es5-shim.min.js' ]
+			helpers: [ 'bower_components/es5-shim/es5-shim.min.js' ]
 		}
 	});
 };
