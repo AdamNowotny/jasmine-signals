@@ -32,7 +32,7 @@ describe('jasmine-signals', function() {
 
 	it('should unsubscribe from signal on stop', function() {
 		spy.stop();
-		
+
 		expect(signal.getNumListeners()).toBe(0);
 	});
 
@@ -86,7 +86,7 @@ describe('jasmine-signals', function() {
 				actual: spy,
 				isNot: true
 			};
-			
+
 			signal.dispatch(1, 5);
 
 			expect(jasmine.signals.matchers.toHaveBeenDispatchedWith.apply(expectParam, [2, 6])).toBe(false);
@@ -110,6 +110,12 @@ describe('jasmine-signals', function() {
 			signal.dispatch(1);
 
 			expect(spy).not.toHaveBeenDispatchedWith(1, 5);
+		});
+
+		it('supports simple object equality', function () {
+			signal.dispatch({foo: 'bar'});
+
+			expect(spy).toHaveBeenDispatchedWith({foo: 'bar'});
 		});
 
 	});
