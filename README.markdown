@@ -94,6 +94,8 @@ Contributors
 
 [Gavin Jackson](https://github.com/gavJackson)
 
+[Robin Murphy](https://github.com/robinjmurphy)
+
 License
 -------
 This code is distributed under Apache License version 2.0
