@@ -4,6 +4,6 @@ _ReSharper.*
 *.suo
 .DS_Store
 .idea/*
-components/*
+bower_components/*
 node_modules/*
 _SpecRunner.html
