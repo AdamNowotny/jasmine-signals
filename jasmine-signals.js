@@ -1,6 +1,7 @@
 (function (global) {
 
 	var spies = [];
+	var jasmineEnv = jasmine.getEnv();
 
 	jasmine.signals = {};
 
@@ -15,7 +16,7 @@
 	};
 
 	jasmine.signals.spyOnSignal.spyOnSignal = jasmine.signals.spyOnSignal;
-	
+
 	/*
 	* Matchers
 	*/
@@ -79,7 +80,7 @@
 			return false;
 		}
 		for (var i = p1.length - 1; i >= 0; i--) {
-			if (p1[i] !== p2[i]) {
+			if (!jasmineEnv.equals_(p1[i], p2[i])) {
 				return false;
 			}
 		}
