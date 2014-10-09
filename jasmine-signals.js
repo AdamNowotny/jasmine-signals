@@ -67,7 +67,7 @@
 
                     result = {
                         pass: spy.dispatches.filter(spy.signalMatcher).map(function (d) {
-                            return util.equals(d, args); //jasmine.getEnv().equals_(d, params); // ? !this.isNot : false;
+                            return util.equals(d, args);
                         }).reduce(function (a, b) {
                             return a || b;
                         }, false)
