@@ -28,7 +28,7 @@
 	},
 	"dependencies": {
 		"bower": "~1.2.8",
-		"grunt": "~0.3.x",
-		"grunt-jasmine-runner": "~0.6.0"
+		"grunt": "~0.4.x",
+		"grunt-contrib-jasmine": "~0.8.0"
 	}
 }
