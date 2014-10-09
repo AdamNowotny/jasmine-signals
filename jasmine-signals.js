@@ -27,156 +27,145 @@
 		}).join('');
 	}
 
-	jasmine.signals.matchers = {
-		toHaveBeenDispatched: function (expectedCount) {
-			this.message = function() {
-				var not = this.isNot ? ' not' : '';
-				var message = 'Expected ' + spy.signal.toString() + not + ' to have been dispatched';
-				if (expectedCount > 0) {
-					message += ' ' + expectedCount + ' times but was ' + spy.count;
-				}
-				if (this.actual.expectedArgs !== undefined) {
-					message += ' with (' + spy.expectedArgs.join(',') + ')';
-					message += ' but was with ' + actualToString(spy);
-				}
-				return message;
-			};
+    jasmine.signals.matchers = {
+        toHaveBeenDispatched: function (util, customEqualityTesters) {
+            return {
+                compare: function (actual, expectedCount) {
+                    var result, spy = getSpy(actual);
+                    if (!(spy instanceof jasmine.signals.SignalSpy)) {
+                        throw new Error('Expected a SignalSpy');
+                    }
 
-			var spy = getSpy(this.actual);
-			if (!(spy instanceof jasmine.signals.SignalSpy)) {
-				throw new Error('Expected a SignalSpy');
-			}
-			return (expectedCount === undefined) ?
-				!!(spy.count) :
-				spy.count === expectedCount;
-		},
-		toHaveBeenDispatchedWith: function () {
-			this.message = function() {
-				var not = this.isNot ? ' not' : '';
-				var message = 'Expected ' + spy.signal.toString() + not + ' to have been dispatched';
-				if (params || spy.expectedArgs !== undefined) {
-					var args = params || [];
-					message += ' with (' + args.join(',') + ')';
-					message += ' but was with ' + actualToString(spy);
-				}
-				return message;
-			};
+                    result = {
+                        pass: (expectedCount === undefined) ? !!(spy.count) : spy.count === expectedCount
+                    };
 
-			var spy = getSpy(this.actual);
-			if (!(spy instanceof jasmine.signals.SignalSpy)) {
-				throw new Error('Expected a SignalSpy');
-			}
-			var params = Array.prototype.slice.call(arguments);
-			return spy.dispatches.filter(spy.signalMatcher).map(function (d) {
-				return (paramsMatch(d, params)) ? !this.isNot : false;
-			}).reduce(function (a, b) {
-				return a || b;
-			}, false);
-		}
-	};
+                    result.message = result.pass ?
+                        'Expected ' + spy.signal.toString() + ' not to have been dispatched' :
+                        'Expected ' + spy.signal.toString() + ' to have been dispatched';
 
-	function paramsMatch(p1, p2) {
-		if (p1.length !== p2.length) {
-			return false;
-		}
-		for (var i = p1.length - 1; i >= 0; i--) {
-			if (!jasmineEnv.equals_(p1[i], p2[i])) {
-				return false;
-			}
-		}
-		return true;
-	}
+                    if (expectedCount > 0) {
+                        result.message += ' ' + expectedCount + ' times but was ' + spy.count;
+                    }
+                    if (actual.expectedArgs !== undefined) {
+                        result.message += ' with (' + spy.expectedArgs.join(',') + ')';
+                        result.message += ' but was with ' + actualToString(spy);
+                    }
 
-	function getSpy(actual) {
-		if (actual instanceof signals.Signal) {
-			return spies.filter(function spiesForSignal(d) {
-				return d.signal === actual;
-			})[0];
-		}
-		return actual;
-	}
+                    return result;
+                }
+            };
+        },
+        toHaveBeenDispatchedWith: function (util, customEqualityTesters) {
+            return {
+                compare: function (actual, expectedParam) {
+                    var result, spy = getSpy(actual), args = [].slice.call(arguments);
+                    args.shift();
+                    if (!(spy instanceof jasmine.signals.SignalSpy)) {
+                        throw new Error('Expected a SignalSpy');
+                    }
 
-	/*
-	* Spy implementation
-	*/
+                    result = {
+                        pass: spy.dispatches.filter(spy.signalMatcher).map(function (d) {
+                            return util.equals(d, args); //jasmine.getEnv().equals_(d, params); // ? !this.isNot : false;
+                        }).reduce(function (a, b) {
+                            return a || b;
+                        }, false)
+                    };
 
-	(function (namespace) {
-		namespace.SignalSpy = function (signal, matcher) {
-			if (!(signal instanceof signals.Signal)) {
-				throw 'spyOnSignal requires a signal as a parameter';
-			}
-			this.signal = signal;
-			this.signalMatcher = matcher || allSignalsMatcher;
-			this.count = 0;
-			this.dispatches = [];
-			this.initialize();
-		};
+                    result.message = result.pass ?
+                        'Expected ' + spy.signal.toString() + ' not to have been dispatched' :
+                        'Expected ' + spy.signal.toString() + ' to have been dispatched';
 
-		function allSignalsMatcher() {
-			return true;
-		}
 
-		namespace.SignalSpy.prototype.initialize = function () {
-			this.signal.add(onSignal, this);
-		};
+                    if (expectedParam !== undefined) {
+                        result.message += ' with (' + args.join(', ') + ')';
+                        result.message += ' but was ' + (spy.dispatches.length ? 'with ' + actualToString(spy) : 'not dispatched');
+                    }
 
-		function onSignal() {
-			var paramArray = (arguments.length) ? Array.prototype.slice.call(arguments) : [];
-			this.dispatches.push(paramArray);
-			if (this.signalMatcher.apply(this, Array.prototype.slice.call(arguments))) {
-				this.count++;
-			}
-		}
+                    return result;
+                }
+            };
+        }
+    };
 
-		namespace.SignalSpy.prototype.stop = function () {
-			this.signal.remove(onSignal, this);
-		};
+    function getSpy(actual) {
+        if (actual instanceof signals.Signal) {
+            return spies.filter(function spiesForSignal(d) {
+                return d.signal === actual;
+            })[0];
+        }
+        return actual;
+    }
 
-		namespace.SignalSpy.prototype.matching = function (predicate) {
-			this.signalMatcher = predicate;
-			return this;
-		};
+    /*
+     * Spy implementation
+     */
 
-		// backward compatibility, deprecated: split your tests
-		namespace.SignalSpy.prototype.reset = function () {
-			this.count = 0;
-			return this;
-		};
+    (function (namespace) {
+        namespace.SignalSpy = function (signal, matcher) {
+            if (!(signal instanceof signals.Signal)) {
+                throw 'spyOnSignal requires a signal as a parameter';
+            }
+            this.signal = signal;
+            this.signalMatcher = matcher || allSignalsMatcher;
+            this.count = 0;
+            this.dispatches = [];
+            this.initialize();
+        };
 
-		// obsolete: use expect(...).haveBeenDispatchedWith(...)
-		namespace.SignalSpy.prototype.matchingValues = function () {
-			this.expectedArgs = Array.prototype.slice.call(arguments);
-			this.signalMatcher = function () {
-				return paramsMatch(this.expectedArgs, arguments);
-			};
-			return this;
-		};
-	})(jasmine.signals);
+        function allSignalsMatcher() {
+            return true;
+        }
 
-	beforeEach(function () {
-		this.addMatchers(jasmine.signals.matchers);
-	});
+        namespace.SignalSpy.prototype.initialize = function () {
+            this.signal.add(onSignal, this);
+        };
 
-	afterEach(function () {
-		spies.forEach(function (d) {
-			d.stop();
-		});
-		spies = [];
-	});
+        function onSignal() {
+            var paramArray = (arguments.length) ? Array.prototype.slice.call(arguments) : [];
+            this.dispatches.push(paramArray);
+            if (this.signalMatcher.apply(this, Array.prototype.slice.call(arguments))) {
+                this.count++;
+            }
+        }
 
-	// exports to multiple environments
-	if (typeof define === 'function' && define.amd) { // AMD
-		define(['signals'], function (amdSignals) {
-			signals = amdSignals;
-			return jasmine.signals.spyOnSignal;
-		});
-	} else if (typeof module !== 'undefined' && module.exports) { // node
-		module.exports = jasmine.signals.spyOnSignal;
-	} else { // browser
-		// use string because of Google closure compiler ADVANCED_MODE
-		/*jslint sub: true */
-		global['spyOnSignal'] = jasmine.signals.spyOnSignal;
-		signals = global['signals'];
-	}
+        namespace.SignalSpy.prototype.stop = function () {
+            this.signal.remove(onSignal, this);
+        };
+
+        namespace.SignalSpy.prototype.matching = function (predicate) {
+            this.signalMatcher = predicate;
+            return this;
+        };
+
+    })(jasmine.signals);
+
+    beforeEach(function () {
+        jasmine.addMatchers(jasmine.signals.matchers);
+    });
+
+    afterEach(function () {
+        spies.forEach(function (d) {
+            d.stop();
+        });
+        spies = [];
+    });
+
+    // exports to multiple environments
+    if (typeof define === 'function' && define.amd) { // AMD
+        define(['signals'], function (amdSignals) {
+            signals = amdSignals;
+            spyOnSignal = jasmine.signals.spyOnSignal;
+            return jasmine.signals.spyOnSignal;
+        });
+    } else if (typeof module !== 'undefined' && module.exports) { // node
+        module.exports = jasmine.signals.spyOnSignal;
+    } else { // browser
+        // use string because of Google closure compiler ADVANCED_MODE
+        /*jslint sub: true */
+        global['spyOnSignal'] = jasmine.signals.spyOnSignal;
+        signals = global['signals'];
+    }
 
 } (this));
