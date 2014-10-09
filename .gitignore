@@ -3,6 +3,7 @@ _ReSharper.*
 *.user
 *.suo
 .DS_Store
+*.iml
 .idea/*
 bower_components/*
 node_modules/*
