@@ -88,14 +88,6 @@ bower update
 ```
 `grunt` or `grunt jasmine-server` to run the tests.
 
-Contributors
-------------
-[Adam Nowotny](https://github.com/AdamNowotny)
-
-[Gavin Jackson](https://github.com/gavJackson)
-
-[Robin Murphy](https://github.com/robinjmurphy)
-
 License
 -------
 This code is distributed under Apache License version 2.0
