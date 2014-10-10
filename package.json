@@ -1,7 +1,7 @@
 {
 	"name": "jasmine-signals",
 	"description": "Jasmine extension that simplifies writing specs for components using js-signals",
-	"version": "0.1.0-1",
+	"version": "0.2.0",
 	"homepage": "https://github.com/AdamNowotny/jasmine-signals",
 	"author": {
 		"name": "Adam Nowotny",
