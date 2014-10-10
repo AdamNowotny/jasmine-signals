@@ -16,7 +16,6 @@ module.exports = function (grunt) {
                 src: [ 'jasmine-signals.js', 'bower_components/js-signals/dist/signals.js' ],
                 options: {
                     specs: 'jasmine-signalsSpec.js'
-                    //helpers: 'bower_components/es5-shim/es5-shim.min.js'
                 }
             }
         }
