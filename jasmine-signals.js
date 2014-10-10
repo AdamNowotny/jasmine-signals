@@ -1,7 +1,5 @@
 (function (global) {
-
 	var spies = [];
-	var jasmineEnv = jasmine.getEnv();
 
 	jasmine.signals = {};
 
@@ -26,6 +24,15 @@
 			return '(' + d + ')';
 		}).join('');
 	}
+
+    function getSpy(actual) {
+        if (actual instanceof signals.Signal) {
+            return spies.filter(function spiesForSignal(d) {
+                return d.signal === actual;
+            })[0];
+        }
+        return actual;
+    }
 
     jasmine.signals.matchers = {
         toHaveBeenDispatched: function (util, customEqualityTesters) {
@@ -89,14 +96,6 @@
         }
     };
 
-    function getSpy(actual) {
-        if (actual instanceof signals.Signal) {
-            return spies.filter(function spiesForSignal(d) {
-                return d.signal === actual;
-            })[0];
-        }
-        return actual;
-    }
 
     /*
      * Spy implementation
@@ -142,7 +141,7 @@
             return this;
         };
 
-        namespace.SignalSpy.prototype.andCallThrough = function() {  //TODO: tests
+        namespace.SignalSpy.prototype.andCallThrough = function() {
             this.plan = function() {
                 var planArgs = arguments;
                 this.stop();  //stop spying - remove the spy binding
@@ -155,14 +154,14 @@
             return this;
         };
 
-        namespace.SignalSpy.prototype.andThrow = function(exceptionMsg) {  //TODO: tests
+        namespace.SignalSpy.prototype.andThrow = function(exceptionMsg) {
             this.plan = function() {
                 throw exceptionMsg;
             };
             return this;
         };
 
-        namespace.SignalSpy.prototype.andCallFake = function(fakeFunc) {  //TODO: tests
+        namespace.SignalSpy.prototype.andCallFake = function(fakeFunc) {
             this.plan = fakeFunc;
             return this;
         };
@@ -191,20 +190,22 @@
         spies = [];
     });
 
+    function setGlobals(signals, spyOnSignal) {
+        global['signals'] = signals;
+        global['spyOnSignal'] = spyOnSignal;
+    }
+
     // exports to multiple environments
     if (typeof define === 'function' && define.amd) { // AMD
         define(['signals'], function (amdSignals) {
-            signals = amdSignals;
-            spyOnSignal = jasmine.signals.spyOnSignal;
+            setGlobals(amdSignals, jasmine.signals.spyOnSignal);
             return jasmine.signals.spyOnSignal;
         });
-    } else if (typeof module !== 'undefined' && module.exports) { // node
-        module.exports = jasmine.signals.spyOnSignal;
-    } else { // browser
-        // use string because of Google closure compiler ADVANCED_MODE
-        /*jslint sub: true */
-        global['spyOnSignal'] = jasmine.signals.spyOnSignal;
-        signals = global['signals'];
+    } else {
+        setGlobals(global['signals'], jasmine.signals.spyOnSignal);
+        if (typeof module !== 'undefined' && module.exports) { // node
+            module.exports = jasmine.signals.spyOnSignal;
+        } else { } // browser
     }
 
 } (this));
