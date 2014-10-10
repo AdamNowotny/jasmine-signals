@@ -111,6 +111,7 @@
             this.signalMatcher = matcher || allSignalsMatcher;
             this.count = 0;
             this.dispatches = [];
+            this.plan = function() {  };
             this.initialize();
         };
 
@@ -118,17 +119,19 @@
             return true;
         }
 
-        namespace.SignalSpy.prototype.initialize = function () {
-            this.signal.add(onSignal, this);
-        };
-
         function onSignal() {
             var paramArray = (arguments.length) ? Array.prototype.slice.call(arguments) : [];
             this.dispatches.push(paramArray);
             if (this.signalMatcher.apply(this, Array.prototype.slice.call(arguments))) {
                 this.count++;
             }
+            this.signal.halt();
+            return this.plan.apply(this, arguments);
         }
+
+        namespace.SignalSpy.prototype.initialize = function () {
+            this.signal.add(onSignal, this, 999);
+        };
 
         namespace.SignalSpy.prototype.stop = function () {
             this.signal.remove(onSignal, this);
@@ -139,7 +142,43 @@
             return this;
         };
 
+        namespace.SignalSpy.prototype.andCallThrough = function() {  //TODO: tests
+            this.plan = function() {
+                var planArgs = arguments;
+                this.stop();  //stop spying - remove the spy binding
+                this.signal._bindings && this.signal._bindings.forEach(function(binding) { //apply args to original listeners
+                    var listener = binding.getListener();
+                    listener.apply(this, planArgs);
+                }.bind(this));
+                this.initialize();  //start again - add our spy back
+            }.bind(this);
+            return this;
+        };
+
+        namespace.SignalSpy.prototype.andThrow = function(exceptionMsg) {  //TODO: tests
+            this.plan = function() {
+                throw exceptionMsg;
+            };
+            return this;
+        };
+
+        namespace.SignalSpy.prototype.andCallFake = function(fakeFunc) {  //TODO: tests
+            this.plan = fakeFunc;
+            return this;
+        };
+
     })(jasmine.signals);
+
+    jasmine.createSignalSpyObj = function(baseName, methodNames) {  //TODO: tests
+        var obj = {};
+        if (!jasmine.isArray_(methodNames) || methodNames.length === 0) {
+            throw new Error('createSignalSpyObj requires a non-empty array of method names to create spies for');
+        }
+        methodNames.forEach(function(name){
+            obj[name] = jasmine.signals.spyOnSignal(new signals.Signal());
+        });
+        return obj;
+    };
 
     beforeEach(function () {
         jasmine.addMatchers(jasmine.signals.matchers);
