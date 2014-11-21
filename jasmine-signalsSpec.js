@@ -261,5 +261,28 @@ describe('jasmine-signals', function() {
 
 	});
 
+    describe('createSignalSpyObj', function() {
+        var error_msg = 'createSignalSpyObj requires a non-empty array of method names to create spies for';
+
+        it('should throw an error if methodNames is an empty array', function() {
+            expect(function() {
+                jasmine.createSignalSpyObj([]);
+            }).toThrowError(error_msg);
+        });
+        it('should throw an error if methodNames is not an array', function() {
+            expect(function() {
+                jasmine.createSignalSpyObj({});
+            }).toThrowError(error_msg);
+        });
+        it('should return an object of SignalSpies', function() {
+            var methodNames = ['test1', 'test2', 'test3'],
+                spies = jasmine.createSignalSpyObj(methodNames);
+
+            methodNames.forEach(function(spy_name) {
+                expect(spies[spy_name] instanceof jasmine.signals.SignalSpy).toEqual(true);
+            });
+        });
+    });
+
 });
 

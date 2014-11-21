@@ -168,12 +168,12 @@
 
     })(jasmine.signals);
 
-    jasmine.createSignalSpyObj = function(baseName, methodNames) {  //TODO: tests
+    jasmine.createSignalSpyObj = function(methodNames) {
         var obj = {};
         if (!jasmine.isArray_(methodNames) || methodNames.length === 0) {
             throw new Error('createSignalSpyObj requires a non-empty array of method names to create spies for');
         }
-        methodNames.forEach(function(name){
+        methodNames.forEach(function(name) {
             obj[name] = jasmine.signals.spyOnSignal(new signals.Signal());
         });
         return obj;
