@@ -1,7 +1,5 @@
 (function (global) {
-
 	var spies = [];
-	var jasmineEnv = jasmine.getEnv();
 
 	jasmine.signals = {};
 
@@ -26,6 +24,15 @@
 			return '(' + d + ')';
 		}).join('');
 	}
+
+    function getSpy(actual) {
+        if (actual instanceof signals.Signal) {
+            return spies.filter(function spiesForSignal(d) {
+                return d.signal === actual;
+            })[0];
+        }
+        return actual;
+    }
 
     jasmine.signals.matchers = {
         toHaveBeenDispatched: function (util, customEqualityTesters) {
@@ -89,14 +96,6 @@
         }
     };
 
-    function getSpy(actual) {
-        if (actual instanceof signals.Signal) {
-            return spies.filter(function spiesForSignal(d) {
-                return d.signal === actual;
-            })[0];
-        }
-        return actual;
-    }
 
     /*
      * Spy implementation
@@ -111,6 +110,7 @@
             this.signalMatcher = matcher || allSignalsMatcher;
             this.count = 0;
             this.dispatches = [];
+            this.plan = function() {  };
             this.initialize();
         };
 
@@ -118,17 +118,19 @@
             return true;
         }
 
-        namespace.SignalSpy.prototype.initialize = function () {
-            this.signal.add(onSignal, this);
-        };
-
         function onSignal() {
             var paramArray = (arguments.length) ? Array.prototype.slice.call(arguments) : [];
             this.dispatches.push(paramArray);
             if (this.signalMatcher.apply(this, Array.prototype.slice.call(arguments))) {
                 this.count++;
             }
+            this.signal.halt();
+            return this.plan.apply(this, arguments);
         }
+
+        namespace.SignalSpy.prototype.initialize = function () {
+            this.signal.add(onSignal, this, 999);
+        };
 
         namespace.SignalSpy.prototype.stop = function () {
             this.signal.remove(onSignal, this);
@@ -139,7 +141,43 @@
             return this;
         };
 
+        namespace.SignalSpy.prototype.andCallThrough = function() {
+            this.plan = function() {
+                var planArgs = arguments;
+                this.stop();  //stop spying - remove the spy binding
+                this.signal._bindings && this.signal._bindings.forEach(function(binding) { //apply args to original listeners
+                    var listener = binding.getListener();
+                    listener.apply(this, planArgs);
+                }.bind(this));
+                this.initialize();  //start again - add our spy back
+            }.bind(this);
+            return this;
+        };
+
+        namespace.SignalSpy.prototype.andThrow = function(exceptionMsg) {
+            this.plan = function() {
+                throw exceptionMsg;
+            };
+            return this;
+        };
+
+        namespace.SignalSpy.prototype.andCallFake = function(fakeFunc) {
+            this.plan = fakeFunc;
+            return this;
+        };
+
     })(jasmine.signals);
+
+    jasmine.createSignalSpyObj = function(methodNames) {
+        var obj = {};
+        if (!jasmine.isArray_(methodNames) || methodNames.length === 0) {
+            throw new Error('createSignalSpyObj requires a non-empty array of method names to create spies for');
+        }
+        methodNames.forEach(function(name) {
+            obj[name] = jasmine.signals.spyOnSignal(new signals.Signal());
+        });
+        return obj;
+    };
 
     beforeEach(function () {
         jasmine.addMatchers(jasmine.signals.matchers);
@@ -152,20 +190,22 @@
         spies = [];
     });
 
+    function setGlobals(signals, spyOnSignal) {
+        global['signals'] = signals;
+        global['spyOnSignal'] = spyOnSignal;
+    }
+
     // exports to multiple environments
     if (typeof define === 'function' && define.amd) { // AMD
         define(['signals'], function (amdSignals) {
-            signals = amdSignals;
-            spyOnSignal = jasmine.signals.spyOnSignal;
+            setGlobals(amdSignals, jasmine.signals.spyOnSignal);
             return jasmine.signals.spyOnSignal;
         });
-    } else if (typeof module !== 'undefined' && module.exports) { // node
-        module.exports = jasmine.signals.spyOnSignal;
-    } else { // browser
-        // use string because of Google closure compiler ADVANCED_MODE
-        /*jslint sub: true */
-        global['spyOnSignal'] = jasmine.signals.spyOnSignal;
-        signals = global['signals'];
+    } else {
+        setGlobals(global['signals'], jasmine.signals.spyOnSignal);
+        if (typeof module !== 'undefined' && module.exports) { // node
+            module.exports = jasmine.signals.spyOnSignal;
+        } else { } // browser
     }
 
 } (this));

@@ -1,5 +1,5 @@
 describe('jasmine-signals', function() {
-	var signal, spy, result;
+	var signal, spy, listenerSpy, result;
 
 	beforeEach(function () {
 		signal = new signals.Signal();
@@ -28,19 +28,112 @@ describe('jasmine-signals', function() {
 		expect(signal.getNumListeners()).toBe(1);
 	});
 
-	it('should unsubscribe from signal on stop', function() {
-		spy.stop();
-
-		expect(signal.getNumListeners()).toBe(0);
-	});
-
 	it('should accept signal in expectations', function () {
 		signal.dispatch();
 
 		expect(signal).toHaveBeenDispatched();
 	});
 
-	describe('toHaveBeenDispatched', function() {
+    it('should halt dispatch before it reaches listeners added before spy invocation', function () {
+        var signal = new signals.Signal();
+        listenerSpy = jasmine.createSpy('listenerSpy');
+        signal.add(listenerSpy);
+        spy = spyOnSignal(signal);
+        signal.dispatch();
+
+        expect(spy).toHaveBeenDispatched();
+        expect(listenerSpy).not.toHaveBeenCalled();
+    });
+
+    it('should halt dispatch before it reaches listeners added after spy invocation', function () {
+        listenerSpy = jasmine.createSpy('listenerSpy');
+        signal.add(listenerSpy);
+        signal.dispatch();
+
+        expect(spy).toHaveBeenDispatched();
+        expect(listenerSpy).not.toHaveBeenCalled();
+    });
+
+    describe('stop', function() {
+        it('should unsubscribe from the signal', function() {
+            spy.stop();
+
+            expect(signal.getNumListeners()).toBe(0);
+        });
+        it('should resume normal dispatch to listeners', function () {
+            listenerSpy = jasmine.createSpy('listenerSpy');
+            signal.add(listenerSpy);
+            spy.stop();
+            signal.dispatch();
+
+            expect(spy).not.toHaveBeenDispatched();
+            expect(listenerSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('andThrow', function() {
+        it('should throw the correct exception', function() {
+            var exceptionMsg = 'test exception';
+            spy.andThrow(exceptionMsg);
+
+            expect(spy).not.toHaveBeenDispatched();
+            expect(signal.dispatch).toThrow(exceptionMsg);
+        });
+        it('should not throw an exception after the spy has been stopped', function () {
+            var exceptionMsg = 'test exception';
+            spy.andThrow(exceptionMsg);
+            spy.stop();
+
+            expect(spy).not.toHaveBeenDispatched();
+            expect(signal.dispatch).not.toThrow(exceptionMsg);
+        });
+    });
+
+    describe('andCallFake', function() {
+        it('should call the mock function on signal dispatch', function() {
+            listenerSpy = jasmine.createSpy('listenerSpy');
+            spy.andCallFake(listenerSpy);
+            signal.dispatch();
+
+            expect(spy).toHaveBeenDispatched();
+            expect(listenerSpy).toHaveBeenCalled();
+        });
+        it('should not call the mock function after the spy has been stopped', function () {
+            listenerSpy = jasmine.createSpy('listenerSpy');
+            spy.andCallFake(listenerSpy);
+            spy.stop();
+            signal.dispatch();
+
+            expect(spy).not.toHaveBeenDispatched();
+            expect(listenerSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('andCallThrough', function() {
+        it('should call through to listeners added before spy invocation', function () {
+            var signal = new signals.Signal();
+            listenerSpy = jasmine.createSpy('listenerSpy');
+            signal.add(listenerSpy);
+            spy = spyOnSignal(signal).andCallThrough();
+            signal.dispatch();
+
+            expect(spy).toHaveBeenDispatched();
+            expect(listenerSpy).toHaveBeenCalled();
+        });
+
+        it('should call through to listeners added after spy invocation', function () {
+            listenerSpy = jasmine.createSpy('listenerSpy');
+            signal.add(listenerSpy);
+            spy.andCallThrough();
+            signal.dispatch();
+
+            expect(spy).toHaveBeenDispatched();
+            expect(listenerSpy).toHaveBeenCalled();
+        });
+    });
+
+
+    describe('toHaveBeenDispatched', function() {
 
 		it('should know if signal dispatched', function() {
 			signal.dispatch();
@@ -167,6 +260,29 @@ describe('jasmine-signals', function() {
 		});
 
 	});
+
+    describe('createSignalSpyObj', function() {
+        var error_msg = 'createSignalSpyObj requires a non-empty array of method names to create spies for';
+
+        it('should throw an error if methodNames is an empty array', function() {
+            expect(function() {
+                jasmine.createSignalSpyObj([]);
+            }).toThrowError(error_msg);
+        });
+        it('should throw an error if methodNames is not an array', function() {
+            expect(function() {
+                jasmine.createSignalSpyObj({});
+            }).toThrowError(error_msg);
+        });
+        it('should return an object of SignalSpies', function() {
+            var methodNames = ['test1', 'test2', 'test3'],
+                spies = jasmine.createSignalSpyObj(methodNames);
+
+            methodNames.forEach(function(spy_name) {
+                expect(spies[spy_name] instanceof jasmine.signals.SignalSpy).toEqual(true);
+            });
+        });
+    });
 
 });
 
