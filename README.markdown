@@ -5,6 +5,7 @@ jasmine-signals[![Build Status](https://secure.travis-ci.org/AdamNowotny/jasmine
 Adds new matchers to Jasmine:
  * toHaveBeenDispatched
  * toHaveBeenDispatchedWith
+ * matching
 
 How to use
 --------------
@@ -17,11 +18,12 @@ or just copy [jasmine-signals.js](https://raw.github.com/AdamNowotny/jasmine-sig
 The library uses some methods not available in old versions of IE (forEach, map, filter), so you might need to include [es5-shim](https://github.com/kriskowal/es5-shim) as well.
 
 ### Create
-First define which signal you're interested in.
+First define which signals you're interested in.
 
 ```js
 var signal = new signals.Signal();
 var signalSpy = spyOnSignal(signal);
+var signalSpies = jasmine.createSignalSpyObj(['method1', 'method2']);
 ```
 
 ### Filtering signals
@@ -44,6 +46,8 @@ expect(signalSpy).toHaveBeenDispatched();  // expect signal to have been dispatc
 expect(signal).toHaveBeenDispatched(); // passing signal is also allowed, first spy will be used
 expect(signal).toHaveBeenDispatched(3); // expect signal to have been dispatched 3 times
 expect(signal).toHaveBeenDispatchedWith(1, 5); // expect signal to have been dispatched with parameters
+expect(signalSpies.method1).toHaveBeenDispatched();
+expect(signalSpies['method2']).not.toHaveBeenDispatched();
 ```
 
 AMD
