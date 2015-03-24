@@ -227,6 +227,12 @@ describe('jasmine-signals', function() {
 			expect(spy).toHaveBeenDispatchedWith({foo: 'bar'});
 		});
 
+        it('supports jasmine.any', function () {
+            signal.dispatch('some string', {foo: 'bar'});
+
+            expect(spy).toHaveBeenDispatchedWith(jasmine.any(String),jasmine.any(Object));
+        });
+
         describe('messages', function () {
             it('should show message when signal expected with matching values', function () {
                 signal.dispatch(3, 4);
